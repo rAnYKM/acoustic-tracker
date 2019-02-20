@@ -1,4 +1,6 @@
-public class TrackerProfile {
+package ca.uwaterloo.crysp.acoustictracker.settings;
+
+public class AcousticSettings {
     // basic settings for acoustic sensing
     private int sampleRate;
     private int downSampling;
@@ -45,7 +47,7 @@ public class TrackerProfile {
         return (float) period / sampleRate;
     }
 
-    public TrackerProfile() {
+    public AcousticSettings() {
         // default settings
         setSampleRate(48000);
         setDownSampling(4);
