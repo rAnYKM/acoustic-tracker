@@ -17,7 +17,7 @@ public class MathHelper {
         return results;
     }
 
-    public static float getAverage(@NotNull float[] values) {
+    public static float average(@NotNull float[] values) {
         float result = 0.0f;
         for(float value: values) {
             result = result + value;
@@ -25,7 +25,7 @@ public class MathHelper {
         return result / values.length;
     }
 
-    public static float getMedian(@NotNull float[] values) {
+    public static float median(@NotNull float[] values) {
         float[] sorted = new float[values.length];
         System.arraycopy(values,0, sorted,0, sorted.length);
         Arrays.sort(sorted);
@@ -37,14 +37,14 @@ public class MathHelper {
         }
     }
 
-    public static List<Integer> getUpperMADIndex(float[] values, float multiplier) {
+    public static List<Integer> upperMADIndex(float[] values, float multiplier) {
         float[] dev = new float[values.length];
         List<Integer> indices = new ArrayList<Integer>();
-        float med = getMedian(values);
+        float med = median(values);
         for(int i = 0; i < dev.length; ++i) {
             dev[i] = Math.abs(values[i] - med);
         }
-        float mdev = getMedian(dev);
+        float mdev = median(dev);
         if (mdev == 0.0f) {
             return null;
         }
@@ -56,8 +56,8 @@ public class MathHelper {
         return indices;
     }
 
-    public static float[] getUpperMAD(float[] values, float multiplier) {
-        List<Integer> indices = getUpperMADIndex(values, multiplier);
+    public static float[] upperMAD(float[] values, float multiplier) {
+        List<Integer> indices = upperMADIndex(values, multiplier);
         float[] results = new float[indices.size()];
         for(int i = 0; i < results.length; ++i) results[i] = values[indices.get(i)];
         return results;
