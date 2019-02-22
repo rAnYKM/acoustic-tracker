@@ -1,6 +1,6 @@
 package ca.uwaterloo.crysp.acoustictracker.utils;
 
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class MathHelper {
         return results;
     }
 
-    public static float average(@NotNull float[] values) {
+    public static float average(float[] values) {
         float result = 0.0f;
         for(float value: values) {
             result = result + value;
@@ -25,7 +25,7 @@ public class MathHelper {
         return result / values.length;
     }
 
-    public static float median(@NotNull float[] values) {
+    public static float median(float[] values) {
         float[] sorted = new float[values.length];
         System.arraycopy(values,0, sorted,0, sorted.length);
         Arrays.sort(sorted);
@@ -45,7 +45,8 @@ public class MathHelper {
             dev[i] = Math.abs(values[i] - med);
         }
         float mdev = median(dev);
-        if (mdev == 0.0f) {
+
+        if (mdev < 1e-6f) {
             return null;
         }
         for(int i = 0; i < dev.length; ++i) {

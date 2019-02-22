@@ -1,5 +1,7 @@
 package ca.uwaterloo.crysp.acoustictracker;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ca.uwaterloo.crysp.acoustictracker.settings.AcousticSettings;
@@ -42,7 +44,7 @@ public class UserTracker {
 
         // TODO: Extract static objects
 
-        if (isRawNoise(data) || isDiffNoise(delta)) {
+        if (isRawNoise(data) || isDiffNoise(delta) || hasGlitch(data)) {
             diffMagnitude.add(new float[data.length]);
             continuousNoiseSlots = continuousNoiseSlots + 1;
             // TODO: Add log information later
@@ -85,12 +87,58 @@ public class UserTracker {
         return (int) Math.floor(distance / dUnit);
     }
 
+    // =======================================================
+    //  Noise detection
+    // =======================================================
+
     private boolean isRawNoise(float[] col) {
-        return MathHelper.median(col) > ts.getFarRawNoise();
+        return MathHelper.median(Arrays.copyOfRange(col, ts.getFarIndex(), col.length)) > ts.getFarRawNoise();
     }
 
     private boolean isDiffNoise(float[] col) {
-        return MathHelper.average(col) > ts.getFarDiffNoise();
+        return MathHelper.average(Arrays.copyOfRange(col, ts.getFarIndex(), col.length)) > ts.getFarDiffNoise();
+    }
+
+    private boolean hasGlitch(float[] col) {
+        int size = 0;
+        for (float elem: col)
+            if (elem > ts.getGlitchNoise()) size++;
+        return size >= ts.getGlitchSize();
+    }
+
+    // =======================================================
+    //  Candidate selection algorithms
+    // =======================================================
+
+    // candidate format: {startIndex, size, peakIndex}
+    private List<int[]> detectCandidates(float[] col) {
+        // exclude the direct transmission
+        float[] trimmedCol = new float[col.length];
+        System.arraycopy(col, 0, trimmedCol, 0, col.length);
+        for(int i = 0; i < ts.getEdgeIndex(); ++i) trimmedCol[i] = 0.0f;
+        for(int i = ts.getEdgeIndex(); i < ts.getStartIndex(); ++ i)
+            if (trimmedCol[i] < ts.getDirectHighMagnitude()) trimmedCol[i] = 0.0f;
+
+        List<Integer> outliers = MathHelper.upperMADIndex(trimmedCol, ts.getOutlierMultiplier());
+        List<int[]> candidates = new ArrayList<int[]>();
+        // clustering the outliers - 1D clustering
+        int formerIndex = -1;
+        for(int index: outliers) {
+            if (candidates.size() == 0) {
+                int[] tmp = {index, 1, index};
+                candidates.add(tmp);
+            } else if (index - formerIndex > ts.getClusterTolerance()) {
+                    int[] tmp = {index, 1, index};
+                    candidates.add(tmp);
+            } else {
+                    int[] tmp = candidates.get(candidates.size() - 1);
+                    // update size and peak
+                    tmp[1] = index - formerIndex;
+                    if (trimmedCol[tmp[2]] < trimmedCol[index]) tmp[2] = index;
+            }
+            formerIndex = index;
+        }
+        return candidates;
     }
 
 }

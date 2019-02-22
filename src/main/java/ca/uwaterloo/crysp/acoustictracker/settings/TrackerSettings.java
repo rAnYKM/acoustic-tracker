@@ -8,7 +8,8 @@ public class TrackerSettings {
     //  Direct transmission interference exclusion parameters
     // =======================================================
 
-    private int startIndex;
+    private int edgeIndex; // the magnitude values ahead of edgeIndex are discarded (set as 0)
+    private int startIndex; // the magnitude values ahead of startIndex are filtered by directHighMagnitude
     private float directHighMagnitude;
 
     // =======================================================
@@ -40,6 +41,7 @@ public class TrackerSettings {
     private int kalmanDefaultDistance;
 
     public String getSettingName() { return settingName; }
+    public int getEdgeIndex() { return edgeIndex; }
     public int getStartIndex() { return startIndex; }
     public float getDirectHighMagnitude() { return directHighMagnitude; }
     public int getFarIndex() { return farIndex; }
@@ -57,6 +59,7 @@ public class TrackerSettings {
     public int getKalmanDefaultDistance() { return kalmanDefaultDistance; }
 
     public void setSettingName(String name) { this.settingName = name; }
+    public void setEdgeIndex(int index) { this.edgeIndex = index; }
     public void setStartIndex(int index) {this.startIndex = index; }
     public void setDirectHighMagnitude(float magnitude) { this.directHighMagnitude = magnitude; }
     public void setFarIndex(int index) { this.farIndex = index; }
@@ -75,6 +78,7 @@ public class TrackerSettings {
 
     public TrackerSettings() {
         setSettingName("Generic");
+        setEdgeIndex(3);
         setStartIndex(11);
         setDirectHighMagnitude(3000);
         setFarIndex(100);
