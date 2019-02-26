@@ -1,4 +1,4 @@
-package ca.uwaterloo.crysp.acoustictracker.utils;
+package ca.uwaterloo.crysp.acoustictracker.helpers;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -10,7 +10,7 @@ import java.util.List;
 public class Kalman1D {
     private float dt;
     private SimpleMatrix F;
-    private SimpleMatrix G;
+    // private SimpleMatrix G;
     private SimpleMatrix H;
     private SimpleMatrix x0;
     private SimpleMatrix Q;
@@ -33,12 +33,11 @@ public class Kalman1D {
         return results;
     }
 
-    public Kalman1D(float t, float q, float r, float d0, float p0) {
-        dt = t;
-        float[][] arrayF = {{1, dt}, {0, 1}};
+    public Kalman1D(float q, float r, float d0, float p0) {
+        float[][] arrayF = {{1, 1}, {0, 1}};
         F = new SimpleMatrix(arrayF);
-        float[][] arrayG = {{dt * dt / 2}, {dt}};
-        G = new SimpleMatrix(arrayG);
+        // float[][] arrayG = {{dt * dt / 2}, {dt}};
+        // G = new SimpleMatrix(arrayG);
         float[][] arrayH = {{1, 0}};
         H = new SimpleMatrix(arrayH);
         float[][] arrayX0 = {{d0}, {0}};

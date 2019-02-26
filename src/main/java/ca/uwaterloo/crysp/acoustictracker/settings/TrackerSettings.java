@@ -31,12 +31,13 @@ public class TrackerSettings {
     private int maxMovementIndex;
     private int minMovementIndex;
     private float movementDiscount;
+    private float[][] distanceThreshold;
 
     // =======================================================
     //  Kalman filter parameters
     // =======================================================
 
-    private float kalmanP;
+    private float kalmanR;
     private float kalmanQ;
     private int kalmanDefaultDistance;
 
@@ -54,9 +55,12 @@ public class TrackerSettings {
     public int getMaxMovementIndex() { return maxMovementIndex; }
     public int getMinMovementIndex() { return minMovementIndex; }
     public float getMovementDiscount() { return movementDiscount; }
-    public float getKalmanP() { return kalmanP; }
+    public float getKalmanR() { return kalmanR; }
     public float getKalmanQ() { return kalmanQ; }
     public int getKalmanDefaultDistance() { return kalmanDefaultDistance; }
+    public float[][] getDistanceThreshold() {
+        return distanceThreshold;
+    }
 
     public void setSettingName(String name) { this.settingName = name; }
     public void setEdgeIndex(int index) { this.edgeIndex = index; }
@@ -72,28 +76,41 @@ public class TrackerSettings {
     public void setMaxMovementIndex(int size) { this.maxMovementIndex = size; }
     public void setMinMovementIndex(int size) { this.minMovementIndex = size; }
     public void setMovementDiscount(float value) { this.movementDiscount = value; }
-    public void setKalmanP(float p) { this.kalmanP = p; }
+    public void setKalmanR(float r) { this.kalmanR = r; }
     public void setKalmanQ(float q) { this.kalmanQ = q; }
     public void setKalmanDefaultDistance(int index) { this.kalmanDefaultDistance = index; }
+    public void setDistanceThreshold(float[][] distanceThreshold) {
+        this.distanceThreshold = distanceThreshold;
+    }
 
     public TrackerSettings() {
         setSettingName("Generic");
         setEdgeIndex(3);
         setStartIndex(11);
         setDirectHighMagnitude(3000);
-        setFarIndex(100);
+        setFarIndex(80);
         setFarRawNoise(400.0f);
-        setFarDiffNoise(120.0f);
-        setGlitchNoise(4000.0f);
+        setFarDiffNoise(180.0f);
+        setGlitchNoise(6000.0f);
         setGlitchSize(10);
         setOutlierMultiplier(3);
         setClusterTolerance(3);
         setMaxMovementIndex(35);
         setMinMovementIndex(10);
         setMovementDiscount(0.95f);
-        setKalmanP(0.25f);
+        setKalmanR(0.25f);
         setKalmanQ(1e-3f);
-        setKalmanDefaultDistance(15);
+        setKalmanDefaultDistance(30);
+        float[][] sampleThreshold = {
+                {0.4f, 320},
+                {0.6f, 270},
+                {0.8f, 200},
+                {1.0f, 150},
+                {1.5f, 120},
+                {1.8f, 90},
+                {2.5f, 80}
+        };
+        setDistanceThreshold(sampleThreshold);
     }
 
 

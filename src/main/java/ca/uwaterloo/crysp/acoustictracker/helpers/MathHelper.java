@@ -1,4 +1,4 @@
-package ca.uwaterloo.crysp.acoustictracker.utils;
+package ca.uwaterloo.crysp.acoustictracker.helpers;
 
 
 
@@ -47,7 +47,7 @@ public class MathHelper {
         float mdev = median(dev);
 
         if (mdev < 1e-6f) {
-            return null;
+            return indices;
         }
         for(int i = 0; i < dev.length; ++i) {
             if (dev[i] / mdev > multiplier) {
