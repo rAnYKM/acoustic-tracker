@@ -58,6 +58,13 @@ public class UserTracker {
         return historyEstDistance.get(index);
     }
 
+    public int getFirstOffset() {
+        return firstOffset;
+    }
+
+    public int getMaxTimeIndex() {
+        return historyEstDistance.size() - 1;
+    }
 
     public float add(float[] rawData) {
         float[] data = Arrays.copyOfRange(rawData, 0, MAX_DISTANCE_INDEX);
@@ -65,8 +72,13 @@ public class UserTracker {
         rawMagnitude.add(data);
 
         if (!firstFlag) {
-            if (!isRawNoise(data)) firstFlag = true;
-            else firstOffset = firstOffset + 1;
+            if (!isRawNoise(data)) {
+                firstFlag = true;
+            }
+            else {
+                firstOffset = firstOffset + 1;
+                System.out.println("first frame is noise");
+            }
             return 0;
         }
         float[] delta = new float[data.length];
@@ -88,9 +100,13 @@ public class UserTracker {
             continuousNoiseSlots = 0;
         }
         // Candidate selection code
+        long t0 = System.currentTimeMillis();
         List<int[]> candidates = detectCandidates(diffMagnitude.get(diffMagnitude.size() - 1));
+        System.out.println(String.format("candidate detection time: %d ms", System.currentTimeMillis()- t0));
         historyCandidates.add(candidates);
+        t0 = System.currentTimeMillis();
         float curDistance = estimateDistance(candidates);
+        System.out.println(String.format("distance estimation time: %d ms", System.currentTimeMillis()- t0));
         System.out.println((rawMagnitude.size() - 1) + ": " + curDistance + "," + curDistance*dUnit + "," + historyObsDistance.get(historyObsDistance.size() - 1));
         return curDistance;
     }
@@ -248,7 +264,10 @@ public class UserTracker {
                 observed_distance = historyEstDistance.get(historyEstDistance.size() - 2);
             }
         }
+
+        long t0 = System.currentTimeMillis();
         float[] results = kalmanFilter.add(observed_distance);
+        System.out.println(String.format("Kalman time measurement: %d ms", System.currentTimeMillis()- t0));
         float resultDistance = results[0];
         float resultSpeed = results[1];
         System.out.println("Obs: " + observed_distance + " Est_d: " + resultDistance + " Est_v" + resultSpeed);
@@ -276,6 +295,10 @@ public class UserTracker {
         if (speed > DIRECTION_TOLERANCE) return 1;
         else if (speed < -DIRECTION_TOLERANCE) return -1;
         else return 0;
+    }
+
+    public int getMaxIndex() {
+        return diffMagnitude.size() - 1;
     }
 
 }
