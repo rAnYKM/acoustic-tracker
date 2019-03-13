@@ -15,6 +15,7 @@ public class UserTracker {
     private final static float DIRECTION_TOLERANCE = 2;
     private final static float MAG_MAG = 1.15f; // magnification of magnitude;
     private final static float DISTANCE_BOUND = 5;
+    private final static int MAX_DISTANCE_INDEX = 150; // 150 * 0.014 ~ 2m
 
     private float dUnit;
     private float tUnit;
@@ -34,6 +35,8 @@ public class UserTracker {
     private int continuousNoiseSlots;
     private int continuousNoObservations;
 
+
+
     private void initialize() {
         firstFlag = false;
         firstOffset = 0;
@@ -47,14 +50,24 @@ public class UserTracker {
         historyObsDistance = new ArrayList<Float>();
     }
 
+    public float getObservation(int index) {
+        return historyObsDistance.get(index);
+    }
 
-    public void add(float[] data) {
+    public float getEstimation(int index) {
+        return historyEstDistance.get(index);
+    }
+
+
+    public float add(float[] rawData) {
+        float[] data = Arrays.copyOfRange(rawData, 0, MAX_DISTANCE_INDEX);
+
         rawMagnitude.add(data);
 
         if (!firstFlag) {
             if (!isRawNoise(data)) firstFlag = true;
             else firstOffset = firstOffset + 1;
-            return;
+            return 0;
         }
         float[] delta = new float[data.length];
         try {
@@ -79,7 +92,7 @@ public class UserTracker {
         historyCandidates.add(candidates);
         float curDistance = estimateDistance(candidates);
         System.out.println((rawMagnitude.size() - 1) + ": " + curDistance + "," + curDistance*dUnit + "," + historyObsDistance.get(historyObsDistance.size() - 1));
-
+        return curDistance;
     }
 
     /*
